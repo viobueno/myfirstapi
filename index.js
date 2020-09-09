@@ -1,33 +1,26 @@
 const express = require(`express`)
-const mongoose = require(`mongoose`)
-
-mongoose.connect('mongodb://localhost:27017/firstapi', {useNewUrlParser: true});
-
-// Works
-
-
 const app = express()
+const mongoose = require(`mongoose`)
+var User = require('./userModel.js')
+
+mongoose.connect('mongodb://localhost:27017/grama', { useNewUrlParser: true });
 
 app.get(`/`, (req, res) => {
-    res.send(`Ola grama`)
+  res.send(`Ola grama`)
 })
 
 app.post(`/user`, (req, res) => {
-    // Create a new mongoose model
-    const userSchema = new mongoose.Schema({ name: String }, { age: Number });
-    var UserModel = mongoose.model('User', userSchema);
-    var user = new UserModel({name: `bruno`, age:28})
-    user.save(function (err) {
-        if (err) return handleError(err);
-        res.send(`usuario salvo com sucesso ${user._id}`)
-      });
+  const user = new User({ name: 'Bruno', age: 28 })
+  user.save().then(() => {
+    res.send(user)
+  })
 })
 
-app.get(`/user`, (req,res) => {
-    var UserModel = mongoose.model('User', userSchema);
-    UserModel.find({}, (err, users) => {
-        res.send(users)
-    });
+app.get(`/user`, (req, res) => {
+  User.find({}, (err, users) => {
+    if (err) console.error(err)
+    res.send(users)
+  })
 })
 
 app.listen(3000)
